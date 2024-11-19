@@ -4,7 +4,8 @@ from subset_sum_calculator import SubsetSumSolver
 from mongo_DB_handler import MongoDBHandler
 from statistical_analysis import StatisticalAnalysis 
 from statistical_analysis_gui import StatisticalAnalysisGUI
-from subset_instance_generator import SubsetInstanceGeneratorWithS
+from instance_generator import SubsetInstanceGeneratorWithS
+
 class SubsetSumGUI:
     def __init__(self, master):
         self.master = master

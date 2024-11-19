@@ -3,7 +3,7 @@ from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from variance_distribution_calculator import VarianceDistributionCalculator
-from istance_generator import SubsetInstanceGenerator
+from istance_generator_dense_sparse import SubsetInstanceGenerator
 from algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
 from dense_sparse_DB_handler import DenseSparseDBHandler 
 from report_generator import ReportGenerator
@@ -18,7 +18,7 @@ class StatisticalAnalysisGUI:
         master.configure(bg="#F4F6F7")  
         master.geometry("700x500")
         self.current_algorithm = 0
-        self.algorithms = ['Dynamic Programming', 'Meet-in-the-Middle', 'Backtracking']
+        self.algorithms = ['Dynamic Programming', 'Meet In The Middle', 'Backtracking']
         
         # Frame con bordo e padding
         self.frame = tk.Frame(master, bg="#FFFFFF", relief=tk.GROOVE, borderwidth=3)
@@ -85,37 +85,39 @@ class StatisticalAnalysisGUI:
         # Crea pulsante 'Compara'
         self.compare_button = tk.Button(self.frame, text="Compara Algoritmi", **button_style, command=self.compare_algorithms)
         self.compare_button.grid(row=2, column=1, padx=10, pady=10, ipadx=10, ipady=5, sticky="ew")
-    
+    def clear_input_frame(self):
+        """Rimuove tutti i widget dall'input frame."""
+        for widget in self.input_frame.winfo_children():
+            widget.destroy()
     def show_input_form(self):
-        """Mostra il form di input per il numero di istanze."""
-        
+        """Mostra il form di input per il numero di istanze, dimensione del set, e altri parametri."""
         self.canvas.get_tk_widget().grid_remove()  # Nasconde il grafico
         self.next_button.grid_remove()  # Nasconde il pulsante "Grafico Successivo"
-        
-        for widget in self.input_frame.winfo_children():
-            widget.destroy()  # Rimuove eventuali widget esistenti nel frame
+        self.clear_input_frame()  # Rimuove eventuali widget esistenti nel frame di input
 
-        # Label e Entry per il numero di istanze
-        tk.Label(self.input_frame, text="Quante istanze dense e sparse vuoi generare?", font=("Arial", 12)).pack(side=tk.LEFT, padx=5)
-        self.num_instances_entry = tk.Entry(self.input_frame, font=("Arial", 12), width=5)
-        self.num_instances_entry.pack(side=tk.LEFT, padx=5)
+        # Crea i vari campi di input necessari
+        inputs = [
+            ("Numero di Istanze:", "num_instances_entry", 5),
+            ("Dimensione Minima del Set:", "min_size_entry", 10),
+            ("Dimensione Massima del Set:", "max_size_entry", 10),
+            ("Valore Massimo per un Elemento del Set:", "max_value_entry", 10),
+            ("Target come metà della somma del set? (True/False):", "is_partition_entry", 5)
+        ]
 
-        # Label e Entry per il target
-        tk.Label(self.input_frame, text="Grandezza insieme T:", font=("Arial", 12)).pack(side=tk.LEFT, padx=5, pady=5)
-        self.target_entry = tk.Entry(self.input_frame, font=("Arial", 12), width=10)
-        self.target_entry.pack(side=tk.LEFT, padx=5)
-
-        # Label e Entry per l'insieme S
-        tk.Label(self.input_frame, text="Grandezza insieme S :", font=("Arial", 12)).pack(side=tk.LEFT, padx=5, pady=5)
-        self.insieme_entry = tk.Entry(self.input_frame, font=("Arial", 12), width=30)
-        self.insieme_entry.pack(side=tk.LEFT, padx=5)
+        # Aggiungi ogni campo di input al frame di input
+        for text, attr, width in inputs:
+            tk.Label(self.input_frame, text=text, font=("Arial", 12)).pack(side=tk.TOP, anchor="w", padx=5, pady=5)
+            entry = tk.Entry(self.input_frame, font=("Arial", 12), width=width)
+            entry.pack(side=tk.TOP, anchor="w", padx=5, pady=2)
+            setattr(self, attr, entry)
 
         # Pulsante per generare le istanze
         generate_input_button = tk.Button(self.input_frame, text="Genera", bg="#1A5276", fg="white", font=("Arial", 14, "bold"), command=self.generate_instances)
-        generate_input_button.pack(side=tk.LEFT, padx=5)
+        generate_input_button.pack(side=tk.TOP, anchor="w", padx=5, pady=10)
 
         # Posiziona il frame di input sotto la casella di testo
         self.input_frame.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
 
     def display_statistics(self):
         # Nasconde il pulsante "Grafico Successivo" e pulisce l'area grafica
@@ -229,26 +231,41 @@ class StatisticalAnalysisGUI:
             messagebox.showerror("Errore", "Inserisci un numero valido di istanze.")
             return
 
-        # Ottieni il valore del target
+        # Ottieni la dimensione minima del set
         try:
-            target = int(self.target_entry.get())  # Usa self.target_entry per il target
+            min_size = int(self.min_size_entry.get())
         except ValueError:
-            messagebox.showerror("Errore", "Inserisci un valore valido per il target.")
+            messagebox.showerror("Errore", "Inserisci un valore valido per la dimensione minima del set.")
             return
-    
-        # Ottieni il valore dell'insieme S
+
+        # Ottieni la dimensione massima del set
         try:
-            s = int(self.insieme_entry.get())  # Usa self.insieme_entry per l'insieme S
+            max_size = int(self.max_size_entry.get())
         except ValueError:
-            messagebox.showerror("Errore", "Inserisci numero valido per l'insieme S.")
+            messagebox.showerror("Errore", "Inserisci un valore valido per la dimensione massima del set.")
             return
+
+        # Ottieni il valore massimo per un elemento del set
+        try:
+            max_value = int(self.max_value_entry.get())
+        except ValueError:
+            messagebox.showerror("Errore", "Inserisci un valore valido per il valore massimo del set.")
+            return
+
+        # Ottieni il valore di is_partition
+        is_partition_str = self.is_partition_entry.get().strip().lower()
+        if is_partition_str not in ['true', 'false']:
+            messagebox.showerror("Errore", "Inserisci 'True' o 'False' per is_partition.")
+            return
+        is_partition = is_partition_str == 'true'
+
         # Crea un'istanza del generatore e genera le istanze
-        generator = SubsetInstanceGenerator(num_instances, target, s)
+        generator = SubsetInstanceGenerator(num_instances, min_size, max_size, max_value, is_partition)
         generator.run_subset_sum_algorithms()  # Esegui e salva i risultati nel DB
 
         # Ottieni il conteggio di istanze e soluzioni salvate
-        dense_count = num_instances  # Ogni volta generiamo il numero specificato di istanze dense
-        sparse_count = num_instances  # E il numero specificato di istanze sparse
+        dense_count = num_instances
+        sparse_count = num_instances
 
         # Mostra un messaggio con il conteggio dei risultati
         self.statistic_text.delete(1.0, tk.END)
@@ -256,7 +273,9 @@ class StatisticalAnalysisGUI:
         self.statistic_text.insert(tk.END, f"Istanze sparse generate: {sparse_count}\n")
         self.statistic_text.insert(tk.END, f"Soluzioni salvate nel DB: {6 * num_instances}\n")
 
-        print(f"Generando {num_instances} istanze con target {target} e insieme S di grandezza {s}.")
+        print(f"Generando {num_instances} istanze con dimensione minima {min_size}, dimensione massima {max_size}, valore massimo {max_value}, e is_partition={is_partition}.")
+
+        
     def compare_algorithms(self):
         """Confronta le prestazioni degli algoritmi."""
         db_handler = DenseSparseDBHandler()  # Crea un'istanza della tua classe di gestione del DB

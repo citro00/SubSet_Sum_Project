@@ -18,7 +18,7 @@ class StatisticalAnalysis:
             algorithm = instance['algorithm']
             if algorithm == "Dynamic Programming":
                 self.dynamic_programming_instances.append(instance)
-            elif algorithm == "Meet-in-the-Middle":
+            elif algorithm == "Meet In The Middle":
                 self.meet_in_the_middle_instances.append(instance)
             elif algorithm == "Backtracking":
                 self.backtracking_instances.append(instance)
@@ -28,7 +28,7 @@ class StatisticalAnalysis:
         statistics = {}
 
         for algorithm, instances in zip(
-            ["Dynamic Programming", "Meet-in-the-Middle", "Backtracking"],
+            ["Dynamic Programming", "Meet In The Middle", "Backtracking"],
             [self.dynamic_programming_instances, self.meet_in_the_middle_instances, self.backtracking_instances]
         ):
             instance_count = len(instances)

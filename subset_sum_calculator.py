@@ -1,4 +1,3 @@
-import time
 from itertools import  combinations
 from time import perf_counter
 class SubsetSumSolver:

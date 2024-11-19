@@ -12,7 +12,7 @@ class VarianceDistributionCalculator:
     def calculate_variance_and_distribution(self):
         """Calcola varianza, distribuzione e deviazione standard delle complessità per ciascun algoritmo."""
         entries = self.db_handler.get_all_entries()  # Recupera tutte le istanze
-        algorithm_data = {'Dynamic Programming': [], 'Meet-in-the-Middle': [], 'Backtracking': []}
+        algorithm_data = {'Dynamic Programming': [], 'Meet In The Middle': [], 'Backtracking': []}
 
         for entry in entries:
             algorithm = entry.get('algorithm')

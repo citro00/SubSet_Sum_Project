@@ -1,14 +1,19 @@
-import os 
+import os
 import io
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
-from reportlab.lib.pagesizes import A4, letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Image, Table, PageBreak
+)
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.platypus import TableStyle
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 from mongo_DB_handler import MongoDBHandler
-from statistical_analysis import StatisticalAnalysis 
+from statistical_analysis import StatisticalAnalysis
 from variance_distribution_calculator import VarianceDistributionCalculator
 from dense_sparse_DB_handler import DenseSparseDBHandler
 from algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
@@ -22,203 +27,332 @@ class ReportGenerator:
         self.efficiency_analyzer = AlgorithmEfficiencyAnalyzer(self.dense_sparse_handler)
         self.filename = filename
 
+        # Stili personalizzati
+        self.styles = self.get_styles()
+
+    def get_styles(self):
+        styles = getSampleStyleSheet()
+
+        # Stili personalizzati con nomi unici per evitare conflitti con quelli esistenti
+        styles.add(ParagraphStyle(
+            name='CustomTitle',
+            parent=styles['Title'],
+            fontSize=26,
+            leading=30,
+            textColor=colors.HexColor("#002E5D"),  # Blu più scuro per maggiore professionalità
+            alignment=1,
+            spaceAfter=30,
+            ))
+
+        styles.add(ParagraphStyle(
+            name='CustomAuthor',
+            parent=styles['Normal'],
+            fontSize=13,
+            leading=18,
+            textColor=colors.HexColor("#555555"),  # Grigio scuro per un tono più sofisticato
+            alignment=1,
+            spaceAfter=10,
+            ))
+
+        styles.add(ParagraphStyle(
+            name='CustomDate',
+            parent=styles['Normal'],
+            fontSize=11,
+            leading=14,
+            textColor=colors.HexColor("#777777"),  # Grigio chiaro per un dettaglio meno intrusivo
+            alignment=1,
+            spaceAfter=20,
+            ))
+
+        styles.add(ParagraphStyle(
+            name='CustomHeading1',
+            parent=styles['Heading1'],
+            fontSize=20,
+            leading=24,
+            textColor=colors.HexColor("#003366"),  # Blu più elegante
+            spaceAfter=15,
+             ))
+
+        styles.add(ParagraphStyle(
+            name='CustomHeading2',
+            parent=styles['Heading2'],
+            fontSize=16,
+            leading=20,
+            textColor=colors.HexColor("#004080"),  # Azzurro intenso per i sottotitoli
+            spaceAfter=10,
+            ))
+
+        styles.add(ParagraphStyle(
+            name='CustomBodyText',
+            parent=styles['Normal'],
+            fontSize=12,
+            leading=18,
+            textColor=colors.HexColor("#333333"),  # Testo più scuro per maggiore leggibilità
+            spaceAfter=12,
+            ))  
+
+        styles.add(ParagraphStyle(
+            name='CustomCaption',
+            parent=styles['Italic'],
+            fontSize=10,
+            leading=14,
+            textColor=colors.HexColor("#666666"),  # Grigio per le didascalie per un effetto raffinato
+            spaceAfter=8,
+            alignment=1,
+            ))
+
+        return styles
+
+       
     def generate_report(self):
         desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
         full_path = os.path.join(desktop_path, self.filename)
 
-        doc = SimpleDocTemplate(full_path, pagesize=A4)
-        styles = getSampleStyleSheet()
-
-        # Stili personalizzati
-        title_style = ParagraphStyle(
-            'TitleStyle',
-            parent=styles['Title'],
-            fontSize=24,
-            textColor=colors.HexColor("#003366"),
-            spaceAfter=12,
-            alignment=1
+        doc = SimpleDocTemplate(
+            full_path,
+            pagesize=A4,
+            rightMargin=50,
+            leftMargin=50,
+            topMargin=50,
+            bottomMargin=50
         )
-
-        heading_style = ParagraphStyle(
-            'HeadingStyle',
-            parent=styles['Heading2'],
-            fontSize=16,
-            textColor=colors.HexColor("#00509E"),
-            spaceAfter=6
-        )
-
-        normal_style = styles['Normal']
-        normal_style.fontSize = 12
 
         elements = []
 
-        # Titolo del progetto
-        title = Paragraph("Progetto Algoritmi Avanzati", title_style)
-        elements.append(title)
-        elements.append(Spacer(1, 12))
+        # Creazione delle sezioni del report
+        self.create_cover_page(elements)
+        self.add_table_of_contents(elements)
+        self.add_introduction(elements)
+        self.add_statistical_analysis(elements)
+        self.add_variance_analysis(elements)
+        self.add_algorithm_efficiency_analysis(elements)
+        self.add_conclusion(elements)
 
-        # Autore
-        author = Paragraph("Ideato da Carmine Citro", normal_style)
-        elements.append(author)
-        elements.append(Spacer(1, 24))
+        # Costruzione del PDF con numeri di pagina
+        doc.build(
+            elements,
+            onFirstPage=self.add_page_numbers,
+            onLaterPages=self.add_page_numbers
+        )
 
-        # Sottotitolo
-        subtitle = Paragraph("Studio Empirico del Problema del Subset Sum", heading_style)
-        elements.append(subtitle)
-        elements.append(Spacer(1, 12))
+        print(f"Il report è stato generato con successo: {full_path}")
 
-        # Statistiche
+    def create_cover_page(self, elements):
+        """Crea la copertina del report."""
+        elements.append(Paragraph("Progetto di Analisi Avanzata degli Algoritmi", self.styles['CustomTitle']))
+        elements.append(Paragraph("Studio Empirico sul Problema del Subset Sum", self.styles['CustomHeading1']))
+        elements.append(Spacer(1, 100))
+        elements.append(Paragraph("Autore: Carmine Citro", self.styles['CustomAuthor']))
+        elements.append(Paragraph(f"Data di Generazione: {datetime.datetime.now().strftime('%d/%m/%Y')}", self.styles['CustomDate']))
+        elements.append(PageBreak())
+
+        
+        
+    def add_table_of_contents(self, elements):
+        """Aggiunge l'indice al report."""
+        elements.append(Paragraph("Indice", self.styles['CustomHeading1']))
+
+        # Creare una tabella per l'indice manuale
+        data = [
+            ["Sezione", "Pagina"],
+            ["Introduzione", "1"],
+            ["Analisi Statistica", "3"],
+            ["Analisi della Varianza e Distribuzione", "5"],
+            ["Analisi dell'Efficienza degli Algoritmi", "7"],
+            ["Conclusione", "10"]
+        ]
+
+        toc_table = Table(data, colWidths=[350, 50])
+        toc_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#E0E0E0")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        elements.append(toc_table)
+        elements.append(PageBreak())
+
+
+    def add_introduction(self, elements):
+        """Aggiunge l'introduzione al report."""
+        elements.append(Paragraph("Introduzione", self.styles['CustomHeading1']))
+        intro_text = """
+        Questo report presenta uno studio empirico sul problema del Subset Sum, con un'analisi dettagliata delle prestazioni
+        di vari algoritmi su istanze numeriche dense e sparse. Il Subset Sum rappresenta un problema centrale nella teoria
+        della complessità computazionale, con applicazioni rilevanti in numerosi contesti pratici, tra cui crittografia,
+        pianificazione e ottimizzazione.
+        """
+        elements.append(Paragraph(intro_text.strip(), self.styles['CustomBodyText']))
+        elements.append(PageBreak())
+
+
+    def add_statistical_analysis(self, elements):
+        """Aggiunge la sezione di analisi statistica."""
+        elements.append(Paragraph("Analisi Statistica", self.styles['CustomHeading1']))
         statistics = self.analysis.collect_statistics()
+
         for algorithm, stats in statistics.items():
-            elements.append(Paragraph(f"<b>Algoritmo: {algorithm}</b>", heading_style))
+            elements.append(Paragraph(f"Algoritmo: {algorithm}", self.styles['CustomHeading2']))
+
+            data = []
             for key, value in stats.items():
                 translated_key = {
-                    "total_instances": "Totale delle istanze",
-                    "num_subsets_found": "Numero di sottoinsiemi trovati",
-                    "avg_size": "Media dimensione",
-                    "avg_target": "Media target",
-                    "avg_complexity": "Media complessità (Tempo di esecuzione)",
+                    "total_instances": "Totale delle Istanze",
+                    "num_subsets_found": "Numero di Sottoinsiemi Trovati",
+                    "avg_size": "Dimensione Media dell'Insieme",
+                    "avg_target": "Valore Medio del Target",
+                    "avg_complexity": "Tempo Medio di Esecuzione (s)",
                 }.get(key, key)
-                
-                elements.append(Paragraph(f"{translated_key}: {value}", normal_style))
+                data.append([translated_key, str(value)])
+
+            table = Table(data, colWidths=[250, 200])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#F7F7F7")),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ]))
+            elements.append(table)
             elements.append(Spacer(1, 12))
 
         # Grafico delle statistiche
         plt.switch_backend('Agg')
-        plt.figure(figsize=(10, 5))
+        plt.figure(figsize=(6, 4))
         self.analysis.plot_statistics(statistics)
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png', bbox_inches='tight')
         buffer.seek(0)
         plt.close()
 
-        elements.append(Spacer(1, 24))
-        elements.append(Paragraph("Grafico delle Statistiche", heading_style))
-        elements.append(Spacer(1, 12))
-        elements.append(Image(buffer, width=500, height=250))
+        elements.append(Image(buffer, width=400, height=300))
+        elements.append(Paragraph("Figura 1: Visualizzazione Grafica delle Statistiche Rilevate", self.styles['CustomCaption']))
+        elements.append(PageBreak())
 
-        # Calcola varianza e distribuzione
+
+    def add_variance_analysis(self, elements):
+        """Aggiunge la sezione di analisi della varianza e distribuzione."""
+        elements.append(Paragraph("Analisi della Varianza e Distribuzione", self.styles['Heading1']))
         variance_results = self.variance_calculator.calculate_variance_and_distribution()
+
         for algorithm, results in variance_results.items():
-            elements.append(Paragraph(f"<b>Algoritmo: {algorithm}</b>", heading_style))
-            elements.append(Paragraph(f"Varianza: {results['variance']:.12f}", normal_style))
-            elements.append(Paragraph(f"Deviazione standard: {results['standard_deviation']:.12f}", normal_style))
+            elements.append(Paragraph(f"Algoritmo: {algorithm}", self.styles['Heading2']))
+            elements.append(Paragraph(f"Varianza: {results['variance']:.12f}", self.styles['BodyText']))
+            elements.append(Paragraph(f"Deviazione standard: {results['standard_deviation']:.12f}", self.styles['BodyText']))
             elements.append(Spacer(1, 12))
 
             # Grafico della distribuzione della varianza
             plt.switch_backend('Agg')
-            plt.figure(figsize=(10, 5))
+            plt.figure(figsize=(6, 4))
             plt.hist(results['complexities'], bins=10, alpha=0.7, color='blue', label=algorithm)
-            plt.title(f"Distribuzione della Varianza per {algorithm}", fontsize=14)
-            plt.xlabel("Complessità (T.E.)", fontsize=12)
-            plt.ylabel("Frequenza", fontsize=12)
+            plt.title(f"Distribuzione della Varianza per {algorithm}")
+            plt.xlabel("Complessità (T.E.)")
+            plt.ylabel("Frequenza")
             plt.legend()
             buffer = io.BytesIO()
             plt.savefig(buffer, format='png', bbox_inches='tight')
             buffer.seek(0)
             plt.close()
 
-            elements.append(Spacer(1, 12))
-            elements.append(Paragraph("Grafico della Distribuzione della Varianza", heading_style))
-            elements.append(Spacer(1, 12))
-            elements.append(Image(buffer, width=500, height=250))
+            elements.append(Image(buffer, width=400, height=300))
+            elements.append(Paragraph(f"Figura: Distribuzione della Varianza per {algorithm}", self.styles['CustomCaption']))
+            elements.append(PageBreak())
 
-        # Analisi dell'efficienza
-        avg_times_dense, avg_times_sparse, variance_std_dense, variance_std_sparse, dense_fastest, sparse_fastest, sorted_dense, sorted_sparse = self.efficiency_analyzer.run_analysis()
-        # Descrizione analisi
-        subtitle = Paragraph("Analisi delle prestazioni algoritmiche tramite istanze numeriche dense e sparse", heading_style)
-        elements.append(subtitle)
+    def add_algorithm_efficiency_analysis(self, elements):
+        """Aggiunge la sezione di analisi dell'efficienza degli algoritmi."""
+        elements.append(Paragraph("Analisi dell'Efficienza degli Algoritmi", self.styles['Heading1']))
+        elements.append(Paragraph(
+            "In questa sezione analizziamo le prestazioni degli algoritmi tramite istanze numeriche dense e sparse.",
+            self.styles['BodyText']
+        ))
         elements.append(Spacer(1, 12))
-        # Descrizione analisi
-    
 
-        # Classifiche
-        elements.append(Paragraph("<b>Classifica Algoritmi per Istanze Dense</b>", heading_style))
+        # Ottenimento dei dati di analisi
+        (
+            avg_times_dense, avg_times_sparse,
+            variance_std_dense, variance_std_sparse,
+            dense_fastest, sparse_fastest,
+            sorted_dense, sorted_sparse
+        ) = self.efficiency_analyzer.run_analysis()
+
+        # Classifica per istanze dense
+        elements.append(Paragraph("Classifica Algoritmi per Istanze Dense", self.styles['Heading2']))
+        data = [["Posizione", "Algoritmo", "Tempo Medio (s)"]]
         for rank, (algo, avg_complexity) in enumerate(sorted_dense, start=1):
-            elements.append(Paragraph(f"{rank}. {algo} - Complessità Media: {avg_complexity:.12f}", normal_style))
+            data.append([str(rank), algo, f"{avg_complexity:.12f}"])
+        table = Table(data, colWidths=[80, 220, 100])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#F2F2F2")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        elements.append(table)
         elements.append(Spacer(1, 12))
 
-        elements.append(Paragraph("<b>Classifica Algoritmi per Istanze Sparse</b>", heading_style))
+        # Classifica per istanze sparse
+        elements.append(Paragraph("Classifica Algoritmi per Istanze Sparse", self.styles['Heading2']))
+        data = [["Posizione", "Algoritmo", "Tempo Medio (s)"]]
         for rank, (algo, avg_complexity) in enumerate(sorted_sparse, start=1):
-            elements.append(Paragraph(f"{rank}. {algo} - Complessità Media: {avg_complexity:.12f}", normal_style))
+            data.append([str(rank), algo, f"{avg_complexity:.12f}"])
+        table = Table(data, colWidths=[80, 220, 100])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#F2F2F2")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        elements.append(table)
         elements.append(Spacer(1, 12))
 
         # Grafici di distribuzione dei tempi di esecuzione
         graphs = self.efficiency_analyzer.plot_execution_time_distribution()
-        for fig in graphs:
+        for idx, fig in enumerate(graphs):
             buffer = io.BytesIO()
             fig.savefig(buffer, format='png', bbox_inches='tight')
             buffer.seek(0)
+            plt.close(fig)
             elements.append(Image(buffer, width=400, height=300))
+            elements.append(Paragraph(
+                f"Figura {idx+1}: Distribuzione dei Tempi di Esecuzione",
+                self.styles['CustomCaption']
+            ))
+            elements.append(Spacer(1, 12))
 
-        # Creazione PDF
-        doc.build(elements)
+    def add_conclusion(self, elements):
+        """Aggiunge la conclusione al report."""
+        elements.append(Paragraph("Conclusione", self.styles['CustomHeading1']))
+        conclusion_text = """
+        In conclusione, lo studio ha evidenziato come l'efficacia degli algoritmi per il problema del Subset Sum vari
+        significativamente a seconda della tipologia dell'istanza analizzata. Le istanze numeriche dense e sparse hanno
+        dimostrato comportamenti diversi in termini di tempi di esecuzione e complessità computazionale. Questi risultati
+        sottolineano l'importanza di una scelta accurata dell'algoritmo in base alle caratteristiche specifiche del problema
+        affrontato, al fine di ottimizzare le risorse computazionali e migliorare l'efficienza.
+        """
+        elements.append(Paragraph(conclusion_text.strip(), self.styles['CustomBodyText']))
 
-        # Salvataggio dei risultati in PDF
-        self.save_results_to_pdf(full_path)
 
-    def save_results_to_pdf(self, filename):
-        """Salva i risultati dell'analisi in un file PDF."""
-        sorted_dense, sorted_sparse = self.efficiency_analyzer.evaluate_best_algorithm()
-        avg_times_dense, avg_times_sparse = self.efficiency_analyzer.calculate_avg_execution_time()
-        variance_std_dense, variance_std_sparse = self.efficiency_analyzer.calculate_variance_and_std_dev()
-        fastest_dense, fastest_sparse = self.efficiency_analyzer.count_fastest_algorithm()
+    def add_page_numbers(self, canvas, doc):
+        """Aggiunge i numeri di pagina al PDF."""
+        page_num = canvas.getPageNumber()
+        text = f"Pagina {page_num}"
+        canvas.setFont('Helvetica', 9)
+        canvas.drawRightString(A4[0] - 50, 20, text)
 
-        pdf = SimpleDocTemplate(filename, pagesize=letter)
-        elements = []
-        styles = getSampleStyleSheet()
-        results_style = ParagraphStyle(
-            'ResultsStyle',
-            parent=styles['Normal'],
-            fontSize=18,
-            spaceAfter=12,
-            alignment=1
-        )
+        # Aggiunge il titolo come intestazione
+        canvas.setFont('Helvetica-Bold', 9)
+        canvas.drawString(50, A4[1] - 50, "Progetto Algoritmi Avanzati")
 
-        # Titolo
-        elements.append(Paragraph("=== Risultati dell'Analisi ===", results_style))
+        # Aggiunge una linea orizzontale
+        canvas.line(50, A4[1] - 55, A4[0] - 50, A4[1] - 55)
 
-        # Tempi di esecuzione medi
-        elements.append(Paragraph("=== Tempi di Esecuzione Medi ===", styles['Heading2']))
+        # Aggiunge una linea orizzontale in basso
+        canvas.line(50, 30, A4[0] - 50, 30)
 
-        # Tabella per istanze dense
-        dense_table_data = [["Algoritmo", "Tempo Medio"]]
-        for algo, time in avg_times_dense.items():
-            dense_table_data.append([algo, f"{time:.12f}"])
-        
-        dense_table = Table(dense_table_data)
-        dense_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#E0E0E0")),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('SIZE', (0, 0), (-1, 0), 12),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ]))
-        
-        elements.append(dense_table)
-        elements.append(Spacer(1, 12))
-
-        # Tabella per istanze sparse
-        sparse_table_data = [["Algoritmo", "Tempo Medio"]]
-        for algo, time in avg_times_sparse.items():
-            sparse_table_data.append([algo, f"{time:.12f}"])
-        
-        sparse_table = Table(sparse_table_data)
-        sparse_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#E0E0E0")),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('SIZE', (0, 0), (-1, 0), 12),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ]))
-        
-        elements.append(sparse_table)
-
-        # Statistiche di varianza
-        elements.append(Paragraph("=== Statistiche di Varianza ===", styles['Heading2']))
-        elements.append(Paragraph(f"Varianza Media per Istanze Dense: {variance_std_dense:.12f}", styles['Normal']))
-        elements.append(Paragraph(f"Varianza Media per Istanze Sparse: {variance_std_sparse:.12f}", styles['Normal']))
-        elements.append(Paragraph(f"Algoritmo più veloce per istanze dense: {fastest_dense}", styles['Normal']))
-        elements.append(Paragraph(f"Algoritmo più veloce per istanze sparse: {fastest_sparse}", styles['Normal']))
-
-        pdf.build(elements)
