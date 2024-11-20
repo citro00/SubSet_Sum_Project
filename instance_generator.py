@@ -14,7 +14,7 @@ class SubsetInstanceGeneratorWithS:
         if self.seed is not None:
             random.seed(self.seed)
 
-        self.db_handler = MongoDBHandler()  # Connessione al database MongoDB
+        self.db_handler = MongoDBHandler()  
 
         # Configura il logger
         logging.basicConfig(level=logging.INFO)
@@ -53,7 +53,7 @@ class SubsetInstanceGeneratorWithS:
                         self.logger.error(f"Errore durante l'esecuzione di {algorithm_name}: {e}")
                         continue  # Passa all'algoritmo successivo
 
-                # Libera esplicitamente la memoria utilizzata
+  
                 del S, target, solver
                 gc.collect()  # Chiama il Garbage Collector per liberare la memoria non più usata
 

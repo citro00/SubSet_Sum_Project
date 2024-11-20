@@ -25,7 +25,7 @@ class SubsetSumGUI:
         self.num_instances_entry.pack(side=tk.LEFT, padx=5)
         
          # Label e Entry per il target
-        tk.Label(self.input_frame, text="Grandezza insieme T:", font=("Arial", 12)).pack(side=tk.LEFT, padx=5)
+        tk.Label(self.input_frame, text="Grandezza valore T:", font=("Arial", 12)).pack(side=tk.LEFT, padx=5)
         self.target_entry = tk.Entry(self.input_frame, font=("Arial", 12), width=10)
         self.target_entry.pack(side=tk.LEFT, padx=5)
 
@@ -150,7 +150,6 @@ class SubsetSumGUI:
             self.display_matrix(matrix, S, T)
 
     def open_statistical_analysis(self):
-        # Creazione di una nuova finestra per l'analisi statistica
         new_window = tk.Toplevel(self.master)
         StatisticalAnalysisGUI(new_window, self.statistical_analysis, self.db_handler) 
 
@@ -176,7 +175,7 @@ class SubsetSumGUI:
             for j in range(T + 1):
                 value = dp[i][j]
                 # Colorazione delle celle in base al valore
-                if  value == 1:  # Supponiamo che 1 rappresenti parte della soluzione ottimale
+                if  value == 1:  
                     value_label = tk.Label(self.matrix_frame, text=str(value), borderwidth=2, relief="solid", bg="lightgreen", width=4, font=("Arial", 12))
                 else:
                     value_label = tk.Label(self.matrix_frame, text=str(value), borderwidth=2, relief="solid", bg="salmon", width=4, font=("Arial", 12))

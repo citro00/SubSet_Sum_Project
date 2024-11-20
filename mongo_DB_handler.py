@@ -3,9 +3,9 @@ from pymongo import MongoClient
 class MongoDBHandler:
     def __init__(self, db_name='subset_sum_db'):
         # Connessione al server MongoDB
-        self.client = MongoClient('localhost', 27017)  # Cambia l'host e la porta se necessario
+        self.client = MongoClient('localhost', 27017) 
         self.db = self.client[db_name]
-        self.collection = self.db['instances']  # Nome della collection
+        self.collection = self.db['instances']  
 
     def save_instance(self, S, T, execution_time, optimal_solution, algorithm):
         # Crea un documento da inserire
@@ -21,7 +21,7 @@ class MongoDBHandler:
         
     def count_entries(self):
         # Restituisce il numero totale di documenti nella collezione
-        return self.collection.count_documents({})  # Ritorna il conteggio dei documenti
+        return self.collection.count_documents({})  
 
     def delete_all(self):
         # Elimina tutti i documenti dalla collezione

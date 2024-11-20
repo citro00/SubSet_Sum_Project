@@ -27,19 +27,17 @@ class ReportGenerator:
         self.efficiency_analyzer = AlgorithmEfficiencyAnalyzer(self.dense_sparse_handler)
         self.filename = filename
 
-        # Stili personalizzati
         self.styles = self.get_styles()
 
     def get_styles(self):
         styles = getSampleStyleSheet()
 
-        # Stili personalizzati con nomi unici per evitare conflitti con quelli esistenti
         styles.add(ParagraphStyle(
             name='CustomTitle',
             parent=styles['Title'],
             fontSize=26,
             leading=30,
-            textColor=colors.HexColor("#002E5D"),  # Blu più scuro per maggiore professionalità
+            textColor=colors.HexColor("#002E5D"),  
             alignment=1,
             spaceAfter=30,
             ))
@@ -49,7 +47,7 @@ class ReportGenerator:
             parent=styles['Normal'],
             fontSize=13,
             leading=18,
-            textColor=colors.HexColor("#555555"),  # Grigio scuro per un tono più sofisticato
+            textColor=colors.HexColor("#555555"), 
             alignment=1,
             spaceAfter=10,
             ))
@@ -59,7 +57,7 @@ class ReportGenerator:
             parent=styles['Normal'],
             fontSize=11,
             leading=14,
-            textColor=colors.HexColor("#777777"),  # Grigio chiaro per un dettaglio meno intrusivo
+            textColor=colors.HexColor("#777777"),  
             alignment=1,
             spaceAfter=20,
             ))
@@ -69,7 +67,7 @@ class ReportGenerator:
             parent=styles['Heading1'],
             fontSize=20,
             leading=24,
-            textColor=colors.HexColor("#003366"),  # Blu più elegante
+            textColor=colors.HexColor("#003366"), 
             spaceAfter=15,
              ))
 
@@ -78,7 +76,7 @@ class ReportGenerator:
             parent=styles['Heading2'],
             fontSize=16,
             leading=20,
-            textColor=colors.HexColor("#004080"),  # Azzurro intenso per i sottotitoli
+            textColor=colors.HexColor("#004080"), 
             spaceAfter=10,
             ))
 
@@ -87,7 +85,7 @@ class ReportGenerator:
             parent=styles['Normal'],
             fontSize=12,
             leading=18,
-            textColor=colors.HexColor("#333333"),  # Testo più scuro per maggiore leggibilità
+            textColor=colors.HexColor("#333333"),  
             spaceAfter=12,
             ))  
 
@@ -96,7 +94,7 @@ class ReportGenerator:
             parent=styles['Italic'],
             fontSize=10,
             leading=14,
-            textColor=colors.HexColor("#666666"),  # Grigio per le didascalie per un effetto raffinato
+            textColor=colors.HexColor("#666666"),  
             spaceAfter=8,
             alignment=1,
             ))
@@ -145,14 +143,12 @@ class ReportGenerator:
         elements.append(Paragraph("Autore: Carmine Citro", self.styles['CustomAuthor']))
         elements.append(Paragraph(f"Data di Generazione: {datetime.datetime.now().strftime('%d/%m/%Y')}", self.styles['CustomDate']))
         elements.append(PageBreak())
-
-        
         
     def add_table_of_contents(self, elements):
         """Aggiunge l'indice al report."""
         elements.append(Paragraph("Indice", self.styles['CustomHeading1']))
 
-        # Creare una tabella per l'indice manuale
+        # Crea una tabella per l'indice manuale
         data = [
             ["Sezione", "Pagina"],
             ["Introduzione", "1"],

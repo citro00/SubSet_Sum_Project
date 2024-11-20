@@ -40,10 +40,10 @@ class StatisticalAnalysis:
                 solution = instance['optimal_solution']
                 execution_time = float(instance.get('execution_time', 0)) 
 
-                num_subsets_found += len(solution) if solution else 0  # Conta i sottoinsiemi trovati
-                total_size += len(S)  # Dimensione dell'insieme S
-                total_target += T  # Valore del target T
-                total_complexity += execution_time  # tempo di esecuzione
+                num_subsets_found += len(solution) if solution else 0  
+                total_size += len(S)  
+                total_target += T  
+                total_complexity += execution_time 
             if instance_count > 0:
                 avg_size = total_size / instance_count
                 avg_target = total_target / instance_count

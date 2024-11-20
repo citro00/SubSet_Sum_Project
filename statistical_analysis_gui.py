@@ -3,7 +3,7 @@ from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from variance_distribution_calculator import VarianceDistributionCalculator
-from istance_generator_dense_sparse import SubsetInstanceGenerator
+from instance_generator_dense_sparse import SubsetInstanceGenerator
 from algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
 from dense_sparse_DB_handler import DenseSparseDBHandler 
 from report_generator import ReportGenerator
@@ -20,7 +20,6 @@ class StatisticalAnalysisGUI:
         self.current_algorithm = 0
         self.algorithms = ['Dynamic Programming', 'Meet In The Middle', 'Backtracking']
         
-        # Frame con bordo e padding
         self.frame = tk.Frame(master, bg="#FFFFFF", relief=tk.GROOVE, borderwidth=3)
         self.frame.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 
@@ -104,7 +103,6 @@ class StatisticalAnalysisGUI:
             ("Target come metà della somma del set? (True/False):", "is_partition_entry", 5)
         ]
 
-        # Aggiungi ogni campo di input al frame di input
         for text, attr, width in inputs:
             tk.Label(self.input_frame, text=text, font=("Arial", 12)).pack(side=tk.TOP, anchor="w", padx=5, pady=5)
             entry = tk.Entry(self.input_frame, font=("Arial", 12), width=width)
@@ -114,8 +112,6 @@ class StatisticalAnalysisGUI:
         # Pulsante per generare le istanze
         generate_input_button = tk.Button(self.input_frame, text="Genera", bg="#1A5276", fg="white", font=("Arial", 14, "bold"), command=self.generate_instances)
         generate_input_button.pack(side=tk.TOP, anchor="w", padx=5, pady=10)
-
-        # Posiziona il frame di input sotto la casella di testo
         self.input_frame.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
 
@@ -195,8 +191,6 @@ class StatisticalAnalysisGUI:
         avg_sizes = [stats['avg_size'] for stats in statistics.values() if isinstance(stats, dict)]
         avg_targets = [stats['avg_target'] for stats in statistics.values() if isinstance(stats, dict)]
         avg_complexities = [stats['avg_complexity'] for stats in statistics.values() if isinstance(stats, dict)]
-
-        # Configura i tre sottografici
         ax1 = self.figure.add_subplot(131)
         ax1.bar(algorithms, avg_sizes, color='teal')
         ax1.set_title('Dimensione Media', fontsize=12)
@@ -224,42 +218,36 @@ class StatisticalAnalysisGUI:
         self.canvas.draw()
 
     def generate_instances(self):
-        # Ottieni il numero di istanze dall'entry
         try:
             num_instances = int(self.num_instances_entry.get())
         except ValueError:
             messagebox.showerror("Errore", "Inserisci un numero valido di istanze.")
             return
-
-        # Ottieni la dimensione minima del set
+        
         try:
             min_size = int(self.min_size_entry.get())
         except ValueError:
             messagebox.showerror("Errore", "Inserisci un valore valido per la dimensione minima del set.")
             return
-
-        # Ottieni la dimensione massima del set
+        
         try:
             max_size = int(self.max_size_entry.get())
         except ValueError:
             messagebox.showerror("Errore", "Inserisci un valore valido per la dimensione massima del set.")
             return
 
-        # Ottieni il valore massimo per un elemento del set
         try:
             max_value = int(self.max_value_entry.get())
         except ValueError:
             messagebox.showerror("Errore", "Inserisci un valore valido per il valore massimo del set.")
             return
 
-        # Ottieni il valore di is_partition
         is_partition_str = self.is_partition_entry.get().strip().lower()
         if is_partition_str not in ['true', 'false']:
             messagebox.showerror("Errore", "Inserisci 'True' o 'False' per is_partition.")
             return
         is_partition = is_partition_str == 'true'
 
-        # Crea un'istanza del generatore e genera le istanze
         generator = SubsetInstanceGenerator(num_instances, min_size, max_size, max_value, is_partition)
         generator.run_subset_sum_algorithms()  # Esegui e salva i risultati nel DB
 
@@ -366,7 +354,7 @@ class StatisticalAnalysisGUI:
         
     def generate_report(self):
         """Genera un report e mostra un messaggio di conferma nel box della grafica."""
-        # Aggiorna il messaggio iniziale nel box della grafica
+       
         self.statistic_text.config(state='normal')  # Abilita il widget per la modifica
         self.statistic_text.delete(1.0, "end")  # Cancella il contenuto precedente
         self.statistic_text.insert("end", "Il report è stato generato sul desktop.")  # Inserisci il messaggio iniziale

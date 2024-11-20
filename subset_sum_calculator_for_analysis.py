@@ -2,10 +2,8 @@ from time import perf_counter
 from bisect import bisect_left
 class SubsetSumSolver:
     def __init__(self, S, T):
-        self.S = S  # Lista degli elementi dell'insieme
-        self.T = T  # Somma target
-
-    
+        self.S = S 
+        self.T = T  
     
     def calculate_dynamic_programming(self):
         """Risoluzione con Programmazione Dinamica utilizzando set per ottimizzare memoria e tempo."""

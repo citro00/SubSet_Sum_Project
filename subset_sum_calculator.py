@@ -1,5 +1,7 @@
-from itertools import  combinations
+from itertools import combinations
 from time import perf_counter
+from collections import defaultdict
+
 class SubsetSumSolver:
     def __init__(self, S, T):
         self.S = S
@@ -38,11 +40,11 @@ class SubsetSumSolver:
         start_time = perf_counter()
 
         def get_subset_sums(arr):
-            subset_sums = {}
+            subset_sums = defaultdict(list)
             for r in range(len(arr) + 1):
                 for subset in combinations(arr, r):
                     subset_sum = sum(subset)
-                    subset_sums[subset_sum] = subset
+                    subset_sums[subset_sum].append(subset)
             return subset_sums
 
         mid = len(self.S) // 2
@@ -62,7 +64,7 @@ class SubsetSumSolver:
             if y in second_half_sums:
                 execution_time = perf_counter() - start_time
                 self.calculations.append(f"Trova sottoinsieme con somma {y} in seconda metà")
-                solution = list(sum_first_half[x]) + list(sum_second_half[y])
+                solution = list(sum_first_half[x][0]) + list(sum_second_half[y][0])  # Prendi il primo sottoinsieme valido
                 return solution, self.calculations, self.operations, execution_time, []
 
             self.calculations.append(f"Controllo se esiste {y} per la somma {x}")
@@ -73,28 +75,38 @@ class SubsetSumSolver:
     def calculate_backtracking(self):
         """Risoluzione con Backtracking."""
         start_time = perf_counter()
+        S_sorted = sorted(self.S, reverse=True)  # Ordina in ordine decrescente per potatura efficace
+        memo = {}
 
         def backtrack(i, current_sum, current_numbers):
             if current_sum == self.T:
                 return True, current_numbers
-            if i == len(self.S) or current_sum > self.T:
+            if i == len(S_sorted) or current_sum > self.T:
                 return False, current_numbers
+            
+            # Usa memoization per evitare calcoli ripetuti
+            key = (i, current_sum)
+            if key in memo:
+                return False, current_numbers
+            memo[key] = True
+            
             self.operations += 1
 
-            include = backtrack(i + 1, current_sum + self.S[i], current_numbers + [self.S[i]])
+            # Prova a includere l'elemento corrente
+            include = backtrack(i + 1, current_sum + S_sorted[i], current_numbers + [S_sorted[i]])
             if include[0]:
-                self.calculations.append(f"Includo {self.S[i]}: {include[1]}")
+                self.calculations.append(f"Includo {S_sorted[i]}: {include[1]}")
                 return include
 
+            # Prova a escludere l'elemento corrente
             exclude = backtrack(i + 1, current_sum, current_numbers)
-            self.calculations.append(f"Escludo {self.S[i]}")
+            self.calculations.append(f"Escludo {S_sorted[i]}")
             return exclude
 
         result = backtrack(0, 0, [])
         execution_time = perf_counter() - start_time
         return result[1], self.calculations, self.operations, execution_time, []
 
-        
     @staticmethod
     def binary_search(arr, x):
         left, right = 0, len(arr) - 1

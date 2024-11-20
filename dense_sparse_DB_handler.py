@@ -4,9 +4,9 @@ class DenseSparseDBHandler:
     def __init__(self, db_name='subset_sum_db', collection_name='dense_sparse_instances'):
         try:
             # Connessione al server MongoDB
-            self.client = MongoClient('localhost', 27017)  # Cambia l'host e la porta se necessario
+            self.client = MongoClient('localhost', 27017)
             self.db = self.client[db_name]
-            self.collection = self.db[collection_name]  # Collezione specifica per istanze dense e sparse
+            self.collection = self.db[collection_name]  
         except errors.ConnectionFailure as e:
             print(f"Errore di connessione al database: {e}")
 
@@ -41,7 +41,6 @@ class DenseSparseDBHandler:
     def delete_all(self):
         """Elimina tutte le istanze nella collezione di set densi e sparsi."""
         try:
-            # Elimina tutte le istanze senza richiedere parametri
             self.collection.delete_many({})
             print("Tutte le istanze sono state eliminate con successo.")
         except errors.PyMongoError as e:
