@@ -94,22 +94,27 @@ Il progetto **Subset Sum Problem Analyzer** è uno strumento completo per l'anal
 ### **Librerie necessarie**
 Per installare le librerie Python richieste, esegui il seguente comando:
 
-```bash
+```sh
 pip install numpy matplotlib reportlab pymongo tkinter
+```
 
-## **Esecuzione**
+### **Esecuzione**
 
 1. Avvia il server MongoDB.
 2. Esegui l'interfaccia principale con il comando:
 
-   python main.py
+```sh
+python main.py
+```
 
-   ## **Utilizzo**
+---
+
+## **Utilizzo**
 
 ### **Interfaccia Grafica**
 
 #### **Calcolo Subset Sum**
-- Seleziona un algoritmo (**Programmazione Dinamica**, **Meet-in-the-Middle**, **Backtracking**).
+- Seleziona un algoritmo (Programmazione Dinamica, Meet-in-the-Middle, Backtracking).
 - Inserisci un insieme e una somma target.
 - Avvia il calcolo per visualizzare i risultati e i tempi di esecuzione.
 
@@ -118,7 +123,7 @@ pip install numpy matplotlib reportlab pymongo tkinter
 - Analizza le prestazioni degli algoritmi attraverso grafici e statistiche dettagliate.
 
 ### **Generazione Report**
-- Accedi all'opzione **"Genera Report"** nell'interfaccia.
+- Accedi all'opzione "Genera Report" nell'interfaccia.
 - Il PDF generato sarà salvato automaticamente sul desktop.
 
 ---
