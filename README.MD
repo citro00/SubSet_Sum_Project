@@ -102,7 +102,6 @@ pip install numpy matplotlib reportlab pymongo tkinter
 1. Avvia il server MongoDB.
 2. Esegui l'interfaccia principale con il comando:
 
-   ```bash
    python main.py
 
    ## **Utilizzo**
