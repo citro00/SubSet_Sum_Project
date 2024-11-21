@@ -88,31 +88,50 @@ Il progetto **Subset Sum Problem Analyzer** è uno strumento completo per l'anal
 ## **Installazione**
 
 ### **Prerequisiti**
-- **Python 3.8+**
-- **MongoDB** (installato e configurato)
-- Librerie Python necessarie:
+- **Python**: Versione 3.8 o superiore.
+- **MongoDB**: Installato e configurato correttamente.
 
-  pip install numpy matplotlib reportlab pymongo tkinter
+### **Librerie necessarie**
+Per installare le librerie Python richieste, esegui il seguente comando:
 
-Esecuzione
-Avvia il server MongoDB.
-Esegui l'interfaccia principale con:
-python main.py
-Utilizzo
-1. Interfaccia Grafica
-Seleziona un algoritmo, inserisci un insieme e una somma target.
-Avvia il calcolo per visualizzare risultati e tempi di esecuzione.
-Analisi Statistica:
-Genera istanze con parametri personalizzati.
-Analizza le prestazioni degli algoritmi.
-2. Generazione Report
-Accedi all'opzione "Genera Report" nell'interfaccia.
-Troverai il PDF generato sul desktop.
-Architettura del Database
-Collezione: instances
-Campi:
-set: L'insieme di numeri.
-target_sum: Somma target.
-execution_time: Tempo di esecuzione.
-algorithm: Nome dell'algoritmo utilizzato.
-optimal_solution: Soluzione ottimale trovata.
+```bash
+pip install numpy matplotlib reportlab pymongo tkinter
+
+## **Esecuzione**
+
+1. Avvia il server MongoDB.
+2. Esegui l'interfaccia principale con il comando:
+
+   ```bash
+   python main.py
+
+   ## **Utilizzo**
+
+### **Interfaccia Grafica**
+
+#### **Calcolo Subset Sum**
+- Seleziona un algoritmo (**Programmazione Dinamica**, **Meet-in-the-Middle**, **Backtracking**).
+- Inserisci un insieme e una somma target.
+- Avvia il calcolo per visualizzare i risultati e i tempi di esecuzione.
+
+#### **Analisi Statistica**
+- Genera istanze con parametri personalizzati.
+- Analizza le prestazioni degli algoritmi attraverso grafici e statistiche dettagliate.
+
+### **Generazione Report**
+- Accedi all'opzione **"Genera Report"** nell'interfaccia.
+- Il PDF generato sarà salvato automaticamente sul desktop.
+
+---
+
+## **Architettura del Database**
+
+### **Collezione**
+- **Nome**: `instances`
+
+### **Campi**
+- `set`: L'insieme di numeri.
+- `target_sum`: La somma target.
+- `solutions`: Soluzioni trovate.
+- `algorithm`: Algoritmo utilizzato.
+- `execution_time`: Tempo di esecuzione dell'algoritmo.
