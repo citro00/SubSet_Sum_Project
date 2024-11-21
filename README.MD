@@ -145,6 +145,4 @@ python main.py
 
 ## **Contributi**
 Contributi e suggerimenti sono benvenuti per migliorare il progetto. Sentiti libero di fare una pull request o aprire un'issue per condividere le tue idee.
-  }
-  ]
-}
+
