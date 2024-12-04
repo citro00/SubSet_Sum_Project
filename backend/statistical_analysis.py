@@ -1,19 +1,28 @@
 import matplotlib.pyplot as plt
 
 class StatisticalAnalysis:
+    """
+    Questa classe si occupa di raccogliere e visualizzare statistiche sulle istanze del problema del subset sum, 
+    categorizzando le istanze in base all'algoritmo utilizzato.
+    """
+
     def __init__(self, db_handler):
+        """
+        Inizializza la classe con un gestore di database e carica tutte le istanze per analizzarle.
+        
+        :param db_handler: Gestore del database da cui recuperare le istanze.
+        """
         self.db_handler = db_handler
         self.instances = self.db_handler.get_all_entries()
-        
-        # Sottogruppi per ogni tipo di algoritmo
         self.dynamic_programming_instances = []
         self.meet_in_the_middle_instances = []
         self.backtracking_instances = []
-
         self.categorize_instances()
 
     def categorize_instances(self):
-        """Dividi le istanze in base al tipo di algoritmo."""
+        """
+        Categorizza le istanze in base all'algoritmo utilizzato (Dynamic Programming, Meet In The Middle, Backtracking).
+        """
         for instance in self.instances:
             algorithm = instance['algorithm']
             if algorithm == "Dynamic Programming":
@@ -24,9 +33,12 @@ class StatisticalAnalysis:
                 self.backtracking_instances.append(instance)
 
     def collect_statistics(self):
-        """Raccoglie le statistiche per ogni sottoinsieme e restituisce un dizionario con i risultati."""
+        """
+        Raccoglie statistiche per ogni categoria di algoritmo e restituisce un dizionario contenente i risultati.
+        
+        :return: Dizionario con le statistiche di ogni algoritmo.
+        """
         statistics = {}
-
         for algorithm, instances in zip(
             ["Dynamic Programming", "Meet In The Middle", "Backtracking"],
             [self.dynamic_programming_instances, self.meet_in_the_middle_instances, self.backtracking_instances]
@@ -38,12 +50,13 @@ class StatisticalAnalysis:
                 S = instance['set']
                 T = instance['target_sum']
                 solution = instance['optimal_solution']
-                execution_time = float(instance.get('execution_time', 0)) 
+                execution_time = float(instance.get('execution_time', 0))
 
-                num_subsets_found += len(solution) if solution else 0  
-                total_size += len(S)  
-                total_target += T  
-                total_complexity += execution_time 
+                num_subsets_found += len(solution) if solution else 0
+                total_size += len(S)
+                total_target += T
+                total_complexity += execution_time
+
             if instance_count > 0:
                 avg_size = total_size / instance_count
                 avg_target = total_target / instance_count
@@ -68,7 +81,11 @@ class StatisticalAnalysis:
         return statistics
 
     def plot_statistics(self, statistics):
-        """Visualizza le statistiche in un grafico a barre."""
+        """
+        Visualizza le statistiche raccolte in un grafico a barre per ciascun algoritmo.
+        
+        :param statistics: Dizionario contenente le statistiche da visualizzare.
+        """
         algorithms = list(statistics.keys())
         avg_sizes = [statistics[alg]["avg_size"] for alg in algorithms]
         avg_targets = [statistics[alg]["avg_target"] for alg in algorithms]

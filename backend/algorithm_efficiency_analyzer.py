@@ -5,12 +5,20 @@ import matplotlib.pyplot as plt
 import hashlib
 
 class AlgorithmEfficiencyAnalyzer:
+    """
+    Questa classe si occupa di analizzare l'efficienza di diversi algoritmi su vari tipi di istanze (dense e sparse).
+    Comprende metodi per calcolare il tempo di esecuzione medio, la varianza, la deviazione standard, il conteggio degli algoritmi più veloci,
+    la generazione di grafici di distribuzione e la valutazione complessiva degli algoritmi.
+    """
+
     def __init__(self, db_handler):
         self.db_handler = db_handler
         self.algorithm_names = ['Dynamic Programming', 'Meet In The Middle', 'Backtracking']
 
     def calculate_avg_execution_time(self):
-        """Calcola il tempo di esecuzione medio per ciascun algoritmo su istanze dense e sparse."""
+        """
+        Calcola il tempo di esecuzione medio per ciascun algoritmo su istanze dense e sparse.
+        """
         dense_times = {algo: [] for algo in self.algorithm_names}
         sparse_times = {algo: [] for algo in self.algorithm_names}
 
@@ -35,7 +43,9 @@ class AlgorithmEfficiencyAnalyzer:
         return avg_times_dense, avg_times_sparse
 
     def calculate_variance_and_std_dev(self):
-        """Calcola la varianza e la deviazione standard dei tempi di esecuzione per ciascun algoritmo."""
+        """
+        Calcola la varianza e la deviazione standard dei tempi di esecuzione per ciascun algoritmo su istanze dense e sparse.
+        """
         dense_times = {algo: [] for algo in self.algorithm_names}
         sparse_times = {algo: [] for algo in self.algorithm_names}
 
@@ -79,7 +89,9 @@ class AlgorithmEfficiencyAnalyzer:
         return variance_std_dense, variance_std_sparse
 
     def count_fastest_algorithm(self):
-        """Conta la frequenza con cui ciascun algoritmo è il più veloce per ciascuna istanza in base al tipo."""
+        """
+        Conta la frequenza con cui ciascun algoritmo è il più veloce per ciascuna istanza, sia densa che sparsa.
+        """
         dense_instances = self.db_handler.get_instances_by_type('dense')
         sparse_instances = self.db_handler.get_instances_by_type('sparse')
 
@@ -93,7 +105,6 @@ class AlgorithmEfficiencyAnalyzer:
             unique_str = str(S_tuple) + '_' + str(T)
             return hashlib.md5(unique_str.encode()).hexdigest()
 
-        # Organizza i tempi per istanza e algoritmo
         for instance in dense_instances:
             instance_id = get_instance_id(instance)
             algo = instance.get('algorithm')
@@ -115,7 +126,6 @@ class AlgorithmEfficiencyAnalyzer:
         dense_fastest = []
         sparse_fastest = []
 
-        # Trova l'algoritmo più veloce per ogni istanza
         for times in dense_times_per_instance.values():
             if times and len(times) == len(self.algorithm_names):
                 fastest_algo = min(times, key=times.get)
@@ -132,7 +142,9 @@ class AlgorithmEfficiencyAnalyzer:
         return dense_count, sparse_count
 
     def plot_execution_time_distribution(self):
-        """Genera grafici di distribuzione dei tempi di esecuzione per ciascun algoritmo e tipo di istanza."""
+        """
+        Genera grafici di distribuzione dei tempi di esecuzione per ciascun algoritmo su istanze dense e sparse.
+        """
         dense_times = {algo: [] for algo in self.algorithm_names}
         sparse_times = {algo: [] for algo in self.algorithm_names}
 
@@ -151,7 +163,6 @@ class AlgorithmEfficiencyAnalyzer:
             if algo in sparse_times and exec_time is not None:
                 sparse_times[algo].append(exec_time)
 
-        # Crea i grafici solo se ci sono dati
         graphs = []
         fig, axs = plt.subplots(2, 3, figsize=(15, 10))
         fig.suptitle("Distribuzione dei Tempi di Esecuzione per Algoritmo e Tipo di Istanze")
@@ -178,18 +189,20 @@ class AlgorithmEfficiencyAnalyzer:
         return graphs
 
     def evaluate_best_algorithm(self, avg_times_dense, avg_times_sparse):
-        """Determina la classifica degli algoritmi in base al tempo medio di esecuzione per istanze dense e sparse."""
+        """
+        Determina la classifica degli algoritmi in base al tempo medio di esecuzione per istanze dense e sparse.
+        """
         sorted_dense = sorted(avg_times_dense.items(), key=lambda x: x[1]) if avg_times_dense else []
         sorted_sparse = sorted(avg_times_sparse.items(), key=lambda x: x[1]) if avg_times_sparse else []
 
         return sorted_dense, sorted_sparse
 
     def run_analysis(self):
-        """Esegui l'analisi completa e restituisci i risultati."""
+        """
+        Esegue l'analisi completa dell'efficienza degli algoritmi e restituisce i risultati.
+        """
         avg_times_dense, avg_times_sparse = self.calculate_avg_execution_time()
-
         sorted_dense, sorted_sparse = self.evaluate_best_algorithm(avg_times_dense, avg_times_sparse)
-
         variance_std_dense, variance_std_sparse = self.calculate_variance_and_std_dev()
         dense_count, sparse_count = self.count_fastest_algorithm()
 

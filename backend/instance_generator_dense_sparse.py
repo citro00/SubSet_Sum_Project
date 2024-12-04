@@ -1,13 +1,17 @@
 import random
 import gc
-from subset_sum_calculator_for_analysis import SubsetSumSolver
-from dense_sparse_DB_handler import DenseSparseDBHandler
+from backend.subset_sum_calculator_for_analysis import SubsetSumSolver
+from backend.dense_sparse_DB_handler import DenseSparseDBHandler
 
 class SubsetInstanceGenerator:
+    """
+    Questa classe genera istanze di problemi del subset sum, le esegue con diversi algoritmi e salva i risultati in un database.
+    """
+    
     def __init__(self, num_instances, min_size, max_size, max_value, is_partition=False):
         """
-        Inizializza il generatore di istanze.
-
+        Inizializza i parametri per la generazione delle istanze.
+        
         :param num_instances: Numero di istanze da generare.
         :param min_size: Dimensione minima del set.
         :param max_size: Dimensione massima del set.
@@ -22,27 +26,23 @@ class SubsetInstanceGenerator:
         self.db_handler = DenseSparseDBHandler()
 
     def generate_instance(self, size, density):
-        """Genera un'istanza densa o sparsa in base alla densità specificata."""
-        if density == 'dense':
-            max_element = self.max_value // 10
-        else:
-            max_element = self.max_value
-
-        # Genera l'insieme S utilizzando un generatore per ridurre il consumo di memoria
+        """
+        Genera un'istanza densa o sparsa in base alla densità specificata.
+        
+        :param size: Dimensione del set.
+        :param density: Tipo di densità ('dense' o 'sparse').
+        :return: Un tuple contenente il set S e il target T.
+        """
+        max_element = self.max_value // 10 if density == 'dense' else self.max_value
         S = [random.randint(1, max_element) for _ in range(size)]
         total_sum = sum(S)
-        if self.is_partition:
-            target = total_sum // 2 
-            #se il parametro is_partition è impostato su True, il valore di target viene
-            # impostato come metà della somma degli elementi del set S.
-        else:
-            target = int(random.uniform(0.4, 0.6) * total_sum) 
-           #Se is_partition è False, il valore di target viene impostato in modo casuale,
-        # scegliendo un valore tra il 40% e il 60% della somma totale degli elementi del set S:
+        target = total_sum // 2 if self.is_partition else int(random.uniform(0.4, 0.6) * total_sum)
         return S, target
 
     def run_subset_sum_algorithms(self):
-        """Esegue gli algoritmi su tutte le istanze generate e salva i risultati nel database."""
+        """
+        Esegue diversi algoritmi di subset sum su tutte le istanze generate e salva i risultati nel database.
+        """
         try:
             for density in ['dense', 'sparse']:
                 for _ in range(self.num_instances):
@@ -50,7 +50,6 @@ class SubsetInstanceGenerator:
                     S, target = self.generate_instance(size, density)
                     solver = SubsetSumSolver(S, target)
 
-                    # Esegui e salva i risultati per ciascun algoritmo
                     for algorithm_method in [
                         solver.calculate_dynamic_programming,
                         solver.calculate_meet_in_the_middle,
@@ -68,13 +67,9 @@ class SubsetInstanceGenerator:
                                 algorithm=algorithm_name
                             )
                         except Exception as e:
-                            # Gestisci errori specifici dell'algoritmo senza interrompere il processo
                             print(f"Errore durante l'esecuzione di {algorithm_method.__name__}: {e}")
                     
-                    # Libera esplicitamente la memoria utilizzata
                     del S, target, solver
-                    gc.collect()  # Chiama il Garbage Collector per liberare la memoria non più usata
-
+                    gc.collect()
         finally:
-            # Chiude la connessione al database al termine o in caso di errore
             self.db_handler.close()

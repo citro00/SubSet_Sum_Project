@@ -3,14 +3,31 @@ from time import perf_counter
 from collections import defaultdict
 
 class SubsetSumSolver:
+    """
+    Questa classe implementa tre metodi diversi per risolvere il problema del subset sum: Programmazione Dinamica,
+    Meet-in-the-Middle e Backtracking. Ciascun metodo include un'analisi dettagliata delle operazioni eseguite.
+    """
+
     def __init__(self, S, T):
+        """
+        Inizializza il set S e il target T insieme a variabili per memorizzare i calcoli effettuati e il conteggio delle operazioni.
+        
+        :param S: Lista di numeri interi che rappresentano il set.
+        :param T: Somma target da raggiungere.
+        """
         self.S = S
         self.T = T
         self.calculations = []
         self.operations = 0
 
     def calculate_dynamic_programming(self):
-        """Risoluzione con Programmazione Dinamica."""
+        """
+        Risoluzione con Programmazione Dinamica.
+        Utilizza una matrice dp per determinare se è possibile ottenere una somma target T utilizzando un sottoinsieme degli elementi di S.
+        La matrice dp[i][t] rappresenta se è possibile ottenere la somma t utilizzando i primi i elementi del set S.
+        
+        :return: Soluzione ottimale, calcoli eseguiti, numero di operazioni, tempo di esecuzione, matrice dp.
+        """
         start_time = perf_counter()
         n = len(self.S)
         dp = [[False] * (self.T + 1) for _ in range(n + 1)]
@@ -36,7 +53,13 @@ class SubsetSumSolver:
         return optimal_solution, self.calculations, self.operations, execution_time, dp
 
     def calculate_meet_in_the_middle(self):
-        """Risoluzione con Meet-in-the-Middle."""
+        """
+        Risoluzione con Meet-in-the-Middle.
+        Divide il set S in due metà, calcola tutte le possibili somme di sottoinsiemi per ciascuna metà e verifica se esistono combinazioni
+        di somme che diano il target T. Questa tecnica è efficace per ridurre il tempo di calcolo con set di grandi dimensioni.
+        
+        :return: Soluzione ottimale, calcoli eseguiti, numero di operazioni, tempo di esecuzione, matrice vuota.
+        """
         start_time = perf_counter()
 
         def get_subset_sums(arr):
@@ -64,7 +87,7 @@ class SubsetSumSolver:
             if y in second_half_sums:
                 execution_time = perf_counter() - start_time
                 self.calculations.append(f"Trova sottoinsieme con somma {y} in seconda metà")
-                solution = list(sum_first_half[x][0]) + list(sum_second_half[y][0])  # Prendi il primo sottoinsieme valido
+                solution = list(sum_first_half[x][0]) + list(sum_second_half[y][0])
                 return solution, self.calculations, self.operations, execution_time, []
 
             self.calculations.append(f"Controllo se esiste {y} per la somma {x}")
@@ -73,9 +96,15 @@ class SubsetSumSolver:
         return [], self.calculations, self.operations, execution_time, []
 
     def calculate_backtracking(self):
-        """Risoluzione con Backtracking."""
+        """
+        Risoluzione con Backtracking.
+        Prova a costruire una soluzione includendo o escludendo ciascun elemento del set, utilizzando un approccio iterativo per evitare overflow dello stack.
+        Utilizza anche la memoizzazione per evitare calcoli ripetuti e un ordinamento decrescente per migliorare l'efficienza della potatura.
+        
+        :return: Soluzione ottimale, calcoli eseguiti, numero di operazioni, tempo di esecuzione, matrice vuota.
+        """
         start_time = perf_counter()
-        S_sorted = sorted(self.S, reverse=True)  # Ordina in ordine decrescente per potatura efficace
+        S_sorted = sorted(self.S, reverse=True)
         memo = {}
 
         def backtrack(i, current_sum, current_numbers):
@@ -84,7 +113,6 @@ class SubsetSumSolver:
             if i == len(S_sorted) or current_sum > self.T:
                 return False, current_numbers
             
-            # Usa memoization per evitare calcoli ripetuti
             key = (i, current_sum)
             if key in memo:
                 return False, current_numbers
@@ -92,13 +120,11 @@ class SubsetSumSolver:
             
             self.operations += 1
 
-            # Prova a includere l'elemento corrente
             include = backtrack(i + 1, current_sum + S_sorted[i], current_numbers + [S_sorted[i]])
             if include[0]:
                 self.calculations.append(f"Includo {S_sorted[i]}: {include[1]}")
                 return include
 
-            # Prova a escludere l'elemento corrente
             exclude = backtrack(i + 1, current_sum, current_numbers)
             self.calculations.append(f"Escludo {S_sorted[i]}")
             return exclude
@@ -109,6 +135,13 @@ class SubsetSumSolver:
 
     @staticmethod
     def binary_search(arr, x):
+        """
+        Implementa una ricerca binaria per verificare la presenza di un elemento in un array ordinato.
+        
+        :param arr: Lista ordinata in cui cercare.
+        :param x: Elemento da cercare.
+        :return: True se l'elemento è presente, altrimenti False.
+        """
         left, right = 0, len(arr) - 1
         while left <= right:
             mid = (left + right) // 2
@@ -122,6 +155,14 @@ class SubsetSumSolver:
 
     @staticmethod
     def find_solution(dp, S, T):
+        """
+        Ricostruisce la soluzione ottimale dalla matrice dp.
+        
+        :param dp: Matrice delle decisioni per la Programmazione Dinamica.
+        :param S: Lista degli elementi del set.
+        :param T: Target da raggiungere.
+        :return: Lista degli elementi che sommano al target.
+        """
         solution = []
         n = len(S)
         

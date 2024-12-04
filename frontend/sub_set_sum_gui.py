@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from subset_sum_calculator import SubsetSumSolver
-from mongo_DB_handler import MongoDBHandler
-from statistical_analysis import StatisticalAnalysis 
-from statistical_analysis_gui import StatisticalAnalysisGUI
-from instance_generator import SubsetInstanceGeneratorWithS
+from backend.subset_sum_calculator import SubsetSumSolver
+from backend.mongo_DB_handler import MongoDBHandler
+from backend.statistical_analysis import StatisticalAnalysis 
+from frontend.statistical_analysis_gui import StatisticalAnalysisGUI
+from backend.instance_generator import SubsetInstanceGeneratorWithS
 
 class SubsetSumGUI:
     def __init__(self, master):

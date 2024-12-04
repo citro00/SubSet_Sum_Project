@@ -1,11 +1,24 @@
 import random
 import logging
 import gc
-from subset_sum_calculator_for_analysis import SubsetSumSolver
-from mongo_DB_handler import MongoDBHandler
+from backend.subset_sum_calculator_for_analysis import SubsetSumSolver
+from backend.mongo_DB_handler import MongoDBHandler
 
 class SubsetInstanceGeneratorWithS:
+    """
+    Questa classe genera istanze del problema del subset sum utilizzando un numero fisso di elementi e un target, 
+    esegue vari algoritmi per risolvere il problema e salva i risultati in un database.
+    """
+
     def __init__(self, num_instances, target, s, seed=None):
+        """
+        Inizializza i parametri per la generazione delle istanze e configura il gestore del database.
+        
+        :param num_instances: Numero di istanze da generare.
+        :param target: Valore target per il problema del subset sum.
+        :param s: Numero di elementi nel set S.
+        :param seed: Seed per la generazione casuale.
+        """
         self.num_instances = num_instances
         self.target = target
         self.s = s
@@ -16,20 +29,25 @@ class SubsetInstanceGeneratorWithS:
 
         self.db_handler = MongoDBHandler()  
 
-        # Configura il logger
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
     def generate_instance(self):
-        """Genera un'istanza con s elementi casuali e un target dato."""
+        """
+        Genera un'istanza del problema con un set di s elementi casuali e un target prestabilito.
+        
+        :return: Una tupla contenente il set S e il target T.
+        """
         S = [random.randint(1, 10000) for _ in range(self.s)]
         return S, self.target
 
     def run_subset_sum_algorithms(self):
-        """Esegue gli algoritmi e salva i risultati nel database."""
+        """
+        Esegue i vari algoritmi per risolvere il problema del subset sum sulle istanze generate e salva i risultati nel database.
+        """
         try:
             for i in range(self.num_instances):
-                S, target = self.generate_instance()  # Genera l'istanza
+                S, target = self.generate_instance()
                 solver = SubsetSumSolver(S, target)
 
                 algorithms = [
@@ -41,7 +59,6 @@ class SubsetInstanceGeneratorWithS:
                 for algorithm_name, algorithm_method in algorithms:
                     try:
                         optimal_solution, execution_time = algorithm_method()
-
                         self.db_handler.save_instance(
                             S=S,
                             T=target,
@@ -51,11 +68,9 @@ class SubsetInstanceGeneratorWithS:
                         )
                     except Exception as e:
                         self.logger.error(f"Errore durante l'esecuzione di {algorithm_name}: {e}")
-                        continue  # Passa all'algoritmo successivo
+                        continue
 
-  
                 del S, target, solver
-                gc.collect()  # Chiama il Garbage Collector per liberare la memoria non più usata
-
+                gc.collect()
         finally:
-            self.db_handler.close()  # Chiudi la connessione al database
+            self.db_handler.close()

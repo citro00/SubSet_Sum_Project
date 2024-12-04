@@ -12,11 +12,11 @@ from reportlab.lib import colors
 from reportlab.platypus import TableStyle
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
-from mongo_DB_handler import MongoDBHandler
-from statistical_analysis import StatisticalAnalysis
-from variance_distribution_calculator import VarianceDistributionCalculator
-from dense_sparse_DB_handler import DenseSparseDBHandler
-from algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
+from backend.mongo_DB_handler import MongoDBHandler
+from backend.statistical_analysis import StatisticalAnalysis
+from backend.variance_distribution_calculator import VarianceDistributionCalculator
+from backend.dense_sparse_DB_handler import DenseSparseDBHandler
+from backend.algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
 
 class ReportGenerator:
     def __init__(self, db_name='subset_sum_db', filename="report.pdf"):

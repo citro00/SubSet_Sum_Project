@@ -1,4 +1,4 @@
-# **Subset Sum Problem Analyzer **
+# Subset Sum Problem Analyzer 
 
 ## **Descrizione del Progetto**
 
@@ -33,8 +33,10 @@ Il progetto **Subset Sum Problem Analyzer** è uno strumento avanzato e completo
 
 5. **Generazione Report**:
    - Generazione di report PDF dettagliati contenenti tutti i dati, grafici e analisi, per una facile condivisione e documentazione.
-
 ---
+## **Esempio di Report Generato**
+
+Nella repository è presente un esempio del report PDF generato dal programma. Questo file, chiamato `report.pdf`, contiene i risultati dettagliati e le analisi svolte utilizzando l'applicazione. Puoi aprire il report direttamente cliccando [qui](./report.pdf).
 
 ## **Struttura del Progetto**
 

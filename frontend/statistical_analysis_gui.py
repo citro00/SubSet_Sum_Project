@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from variance_distribution_calculator import VarianceDistributionCalculator
-from instance_generator_dense_sparse import SubsetInstanceGenerator
-from algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
-from dense_sparse_DB_handler import DenseSparseDBHandler 
-from report_generator import ReportGenerator
+from backend.variance_distribution_calculator import VarianceDistributionCalculator
+from backend.instance_generator_dense_sparse import SubsetInstanceGenerator
+from backend.algorithm_efficiency_analyzer import AlgorithmEfficiencyAnalyzer
+from backend.dense_sparse_DB_handler import DenseSparseDBHandler 
+from backend.report_generator import ReportGenerator
 
 class StatisticalAnalysisGUI:
     
